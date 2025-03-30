@@ -16,6 +16,7 @@ public abstract class Sign extends Sprite implements IGameElement
         this.court = court;
         setSize(texture.getWidth() / 16F, texture.getHeight() / 16F);
         setCenter(x, y);
+        setOriginCenter();
     }
 
     @Override

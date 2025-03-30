@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import net.pottx.action.Pathfinder;
 import net.pottx.element.Court;
 
 import java.util.Random;
@@ -18,6 +19,7 @@ public class Match implements Screen
     private final SpriteBatch batch;
     private final Court court;
     public final Random rand;
+    public final Pathfinder pathfinder;
 
     public Match()
     {
@@ -25,6 +27,8 @@ public class Match implements Screen
         batch = new SpriteBatch();
         court = new Court(this, 9, 5);
         rand = new Random();
+        pathfinder = new Pathfinder();
+        pathfinder.setFilter(pos -> !court.isPosBlocked(pos));
     }
 
     @Override

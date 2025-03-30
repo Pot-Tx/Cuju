@@ -22,6 +22,7 @@ public class Cuju extends Game
         textureManager.load("assets/silence.png", Texture.class);
         textureManager.load("assets/pillar.png", Texture.class);
         textureManager.load("assets/goal.png", Texture.class);
+        textureManager.load("assets/star.png", Texture.class);
         loading = true;
     }
 

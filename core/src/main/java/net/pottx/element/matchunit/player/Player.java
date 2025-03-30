@@ -1,25 +1,29 @@
-package net.pottx.element.matchunit;
+package net.pottx.element.matchunit.player;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import net.pottx.Action;
 import net.pottx.Cuju;
 import net.pottx.Pos;
+import net.pottx.action.Action;
 import net.pottx.element.Court;
+import net.pottx.element.matchunit.Ball;
+import net.pottx.element.matchunit.MatchUnit;
 import net.pottx.element.sign.Sign;
 
 public class Player extends MatchUnit
 {
     private Action action;
-
     public boolean facingLeft;
+    private boolean triedCatch;
+    private float motionZ;
 
     public Player(Court court, Pos pos)
     {
         super(court, pos);
         action = Action.NONE;
         facingLeft = pos.getX() > court.sizeX / 2;
+        triedCatch = false;
+        motionZ = 0.0F;
     }
 
     @Override
@@ -35,9 +39,16 @@ public class Player extends MatchUnit
     @Override
     public void logic(float delta)
     {
-        if (isActing() && action.perform(this, delta))
+        if (isActing())
         {
-            setAction(Action.NONE, tilePos);
+            if (action.perform(this, delta))
+            {
+                setAction(Action.NONE, tilePos);
+            }
+        }
+        else
+        {
+            tryCatchBall();
         }
 
         if (sprite.isFlipX() != facingLeft)
@@ -58,39 +69,18 @@ public class Player extends MatchUnit
             }
         }
 
-        super.logic(delta);
-    }
-
-    public float act(Pos target, int button)
-    {
-        int stepDist = tilePos.getStepDist(target);
-        switch (button)
+        exactPos.z += motionZ * delta;
+        if (exactPos.z <= 0.0F)
         {
-            case Input.Buttons.LEFT:
-                if (stepDist == 0)
-                {
-                    return setAction(Action.WAIT, target);
-                }
-                else if (stepDist == 1 && !court.isPosBlocked(target))
-                {
-                    return setAction(Action.MOVE, target);
-                }
-                break;
-
-            case Input.Buttons.RIGHT:
-                if (isHoldingBall() && stepDist > 0)
-                {
-                    if (target.equals(court.getGoal().tilePos))
-                    {
-                        return setAction(Action.SHOOT, target);
-                    }
-                    return setAction(Action.KICK, target);
-                }
-                break;
-
-            default:
+            exactPos.z = 0.0F;
+            motionZ = 0.0F;
         }
-        return 0.0F;
+        else
+        {
+            motionZ -= 8.0F * delta;
+        }
+
+        super.logic(delta);
     }
 
     public boolean isActing()
@@ -98,7 +88,7 @@ public class Player extends MatchUnit
         return action != Action.NONE;
     }
 
-    private float setAction(Action action, Pos pos)
+    public float setAction(Action action, Pos pos)
     {
         this.action = action;
         return action.set(this, pos);
@@ -125,6 +115,29 @@ public class Player extends MatchUnit
         if (isHoldingBall())
         {
             court.getBall().holdingPlayer = null;
+        }
+    }
+
+    protected void tryCatchBall()
+    {
+        Ball ball = court.getBall();
+        if (!isHoldingBall() && tilePos.equals(ball.tilePos) && ball.exactPos.z < 1.0F)
+        {
+            if (!triedCatch)
+            {
+                triedCatch = true;
+                if (court.match.rand.nextFloat() < 0.5F)
+                {
+                    performJumpAnim();
+                    ball.motion.x /= 8.0F;
+                    ball.motion.y /= 8.0F;
+                    ball.motion.z /= 2.0F;
+                }
+            }
+        }
+        else if (triedCatch)
+        {
+            triedCatch = false;
         }
     }
 
@@ -155,5 +168,10 @@ public class Player extends MatchUnit
     public void performRotationAnim(float rotation)
     {
         sprite.rotate(facingLeft ? -rotation : rotation);
+    }
+
+    public void performJumpAnim()
+    {
+        motionZ = 2.0F;
     }
 }

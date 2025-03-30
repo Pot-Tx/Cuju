@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector3;
 import net.pottx.Cuju;
 import net.pottx.Pos;
 import net.pottx.element.Court;
+import net.pottx.element.matchunit.player.Player;
 
 public class Ball extends MatchUnit
 {
@@ -87,6 +88,10 @@ public class Ball extends MatchUnit
                     {
                         tilePos.move(1, 0);
                     }
+                }
+                else if (!court.isPosValid(tilePos))
+                {
+                    tilePos.set(exactPos.x, exactPos.y);
                 }
             }
         }

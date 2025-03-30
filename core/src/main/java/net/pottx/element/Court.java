@@ -1,7 +1,5 @@
 package net.pottx.element;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -9,26 +7,32 @@ import com.badlogic.gdx.math.MathUtils;
 import net.pottx.Cuju;
 import net.pottx.Match;
 import net.pottx.Pos;
+import net.pottx.action.Behavior;
 import net.pottx.element.matchunit.*;
+import net.pottx.element.matchunit.player.Player;
+import net.pottx.element.matchunit.player.PlayerBot;
+import net.pottx.element.matchunit.player.PlayerControlled;
 import net.pottx.element.sign.Sign;
 
 import java.util.*;
 
 public class Court implements IGameElement, ICollideable
 {
+    public static final float TICK = 0.03125F;
     public final Match match;
     public final int sizeX;
     public final int sizeY;
     private final List<Player> players;
     private int curPlayer;
     private Ball ball;
-    private Pillar[] pillars;
+    private final Pillar[] pillars;
     private Goal goal;
-    private float waitingAnim;
+    public float waitingAnim;
     private final Set<Sign> signs;
     private Sprite actingPointer;
     private final List<MatchUnit> renderUnits;
     private final Comparator<MatchUnit> renderSorter;
+    private float updateRemainder;
 
     public Court(Match match, int x, int y)
     {
@@ -38,7 +42,7 @@ public class Court implements IGameElement, ICollideable
         players = new ArrayList<>();
         pillars = new Pillar[2];
         curPlayer = 0;
-        waitingAnim = 0;
+        waitingAnim = -1.0F;
         signs = new HashSet<>();
         renderUnits = new ArrayList<>();
         renderSorter = (o1, o2) ->
@@ -81,31 +85,19 @@ public class Court implements IGameElement, ICollideable
             }
             return 0;
         };
+        updateRemainder = 0.0F;
     }
 
     @Override
     public void input()
     {
         Player player = getActingPlayer();
+
         if (player != null)
         {
-            if (waitingAnim == 0.0F)
+            if (waitingAnim < 0.0F)
             {
-                if (!player.isActing())
-                {
-                    Pos mousePos = new Pos(match.getMouseOver());
-                    if (isPosValid(mousePos))
-                    {
-                        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
-                        {
-                            waitingAnim = player.act(mousePos, Input.Buttons.LEFT);
-                        }
-                        else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT))
-                        {
-                            waitingAnim = player.act(mousePos, Input.Buttons.RIGHT);
-                        }
-                    }
-                }
+                player.input();
             }
         }
     }
@@ -113,21 +105,33 @@ public class Court implements IGameElement, ICollideable
     @Override
     public void logic(float delta)
     {
+        players.forEach(player -> player.logic(delta));
+
         if (waitingAnim > 0.0F)
         {
             waitingAnim -= delta;
             if (waitingAnim <= 0.0F)
             {
                 waitingAnim = 0.0F;
-                if (++curPlayer == players.size())
-                {
-                    curPlayer = 0;
-                }
             }
         }
 
-        players.forEach(player -> player.logic(delta));
-        ball.logic(delta);
+        if (waitingAnim == 0.0F && !getActingPlayer().isActing())
+        {
+            waitingAnim = -1.0F;
+            if (++curPlayer == players.size())
+            {
+                curPlayer = 0;
+            }
+        }
+
+        updateRemainder += delta;
+        while (updateRemainder >= TICK)
+        {
+            updateRemainder -= TICK;
+            ball.logic(TICK);
+        }
+
         for (Sign sign : signs)
         {
             sign.logic(delta);
@@ -212,8 +216,8 @@ public class Court implements IGameElement, ICollideable
 
     public void init()
     {
-        spawnPlayer(new Pos(0, 2));
-        //spawnPlayer(new Pos(8, 2));
+        spawnPlayer(new PlayerControlled(this, new Pos(0, 2)));
+        spawnPlayer(new PlayerBot(this, new Pos(8, 2), Behavior.RECKLESS));
         ball = new Ball(this, new Pos(1, 2));
         renderUnits.add(ball);
         pillars[0] = new Pillar(this, new Pos(4, 1));
@@ -227,9 +231,8 @@ public class Court implements IGameElement, ICollideable
         actingPointer.setSize(actingPointer.getWidth() / 16F, actingPointer.getHeight() / 16F);
     }
 
-    public void spawnPlayer(Pos pos)
+    public void spawnPlayer(Player player)
     {
-        Player player = new Player(this, pos);
         players.add(player);
         renderUnits.add(player);
     }

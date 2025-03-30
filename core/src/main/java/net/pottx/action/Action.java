@@ -1,8 +1,9 @@
-package net.pottx;
+package net.pottx.action;
 
+import net.pottx.Pos;
 import net.pottx.element.matchunit.Ball;
 import net.pottx.element.matchunit.MatchUnit;
-import net.pottx.element.matchunit.Player;
+import net.pottx.element.matchunit.player.Player;
 import net.pottx.element.sign.Silence;
 
 import java.util.Random;
@@ -79,9 +80,14 @@ public abstract class Action
                 player.releaseBall();
                 Random rand = player.court.match.rand;
                 float z = 1.0F + rand.nextFloat() * 2.0F;
-                float t = 2.5F * z / 8.0F;
-                float x = ((float) pos.getX() + 0.5F - ball.exactPos.x) * (1.0F + (rand.nextFloat() - 0.5F) * 0.25F) / t;
-                float y = ((float) pos.getY() + 0.5F - ball.exactPos.y) * (1.0F + (rand.nextFloat() - 0.5F) * 0.25F) / t;
+                float t = 2.75F * z / 8.0F;
+
+                float x = ((float) pos.getX() + 0.5F - ball.exactPos.x) / t;
+                float y = ((float) pos.getY() + 0.5F - ball.exactPos.y) / t;
+                float len = (float) Math.sqrt(x * x + y * y);
+                x += (rand.nextFloat() - 0.5F) * len * 0.25F;
+                y += (rand.nextFloat() - 0.5F) * len * 0.25F;
+
                 ball.exactPos.z = 0.0F;
                 ball.launch(x, y, z);
                 player.performRotationAnim(Math.min(30F, (float) Math.sqrt(x * x + z * z) * 5.0F));
@@ -93,7 +99,7 @@ public abstract class Action
         public boolean perform(Player player, float delta)
         {
             Ball ball = player.court.getBall();
-            if (ball.motion.len() == 0.0F)
+            if (ball.motion.len() == 0.0F && ball.exactPos.z < 0.125F)
             {
                 MatchUnit unit = player.court.getUnitAt(ball.tilePos);
                 if (unit instanceof Player)
@@ -117,23 +123,29 @@ public abstract class Action
                 player.releaseBall();
                 Random rand = player.court.match.rand;
                 float dZ = player.court.getGoal().centerZ;
+
                 float z = (float) Math.sqrt(16F * dZ);
                 float t = z / 8.0F;
                 z *= 1.0F + (rand.nextFloat() - 0.5F) * 0.25F;
-                float x = ((float) pos.getX() + 0.5F - ball.exactPos.x) * (1.0F + (rand.nextFloat() - 0.5F) * 0.25F) / t;
-                float y = ((float) pos.getY() + 0.5F - ball.exactPos.y) * (1.0F + (rand.nextFloat() - 0.5F) * 0.25F) / t;
+
+                float x = ((float) pos.getX() + 0.5F - ball.exactPos.x) / t;
+                float y = ((float) pos.getY() + 0.5F - ball.exactPos.y) / t;
+                float len = (float) Math.sqrt(x * x + y * y);
+                x += (rand.nextFloat() - 0.5F) * len * 0.25F;
+                y += (rand.nextFloat() - 0.5F) * len * 0.25F;
+
                 ball.exactPos.z = 0.0F;
                 ball.launch(x, y, z);
                 player.performRotationAnim(Math.min(30F, (float) Math.sqrt(x * x + z * z) * 5.0F));
             }
-            return 1.5F;
+            return 1.0F;
         }
 
         @Override
         public boolean perform(Player player, float delta)
         {
             Ball ball = player.court.getBall();
-            if (ball.motion.len() < 0.125F)
+            if (ball.motion.len() == 0.0F && ball.exactPos.z < 0.125F)
             {
                 MatchUnit unit = player.court.getUnitAt(ball.tilePos);
                 if (unit instanceof Player)
