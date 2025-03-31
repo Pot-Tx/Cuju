@@ -8,7 +8,7 @@ import net.pottx.action.Action;
 import net.pottx.element.Court;
 import net.pottx.element.matchunit.Ball;
 import net.pottx.element.matchunit.MatchUnit;
-import net.pottx.element.sign.Sign;
+import net.pottx.element.sign.Particle;
 
 public class Player extends MatchUnit
 {
@@ -160,9 +160,9 @@ public class Player extends MatchUnit
         }
     }
 
-    public void spawnSign(Sign sign)
+    public void spawnSign(Particle particle)
     {
-        court.spawnSign(sign);
+        court.spawnParticle(particle);
     }
 
     public void performRotationAnim(float rotation)

@@ -3,6 +3,7 @@ package net.pottx;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
+import net.pottx.view.Match;
 
 public class Cuju extends Game
 {

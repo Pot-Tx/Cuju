@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import net.pottx.Cuju;
 import net.pottx.Pos;
 import net.pottx.element.Court;
-import net.pottx.element.sign.Congrat;
+import net.pottx.element.sign.Star;
 
 import java.util.Random;
 
@@ -61,7 +61,7 @@ public class Goal extends MatchUnit implements ICollideable
                             float relY = rand.nextFloat() - 0.5F;
                             float motX = relX * (2.0F + rand.nextFloat() * 6.0F);
                             float motY = 1.5F + rand.nextFloat() * 4.5F;
-                            court.spawnSign(new Congrat(court, exactPos.x + relX, exactPos.y + centerZ + relY, motX, motY));
+                            court.spawnParticle(new Star(court, exactPos.x + relX, exactPos.y + centerZ + relY, motX, motY));
                         }
                     }
                 }

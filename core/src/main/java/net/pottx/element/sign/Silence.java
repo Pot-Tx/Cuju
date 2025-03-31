@@ -3,7 +3,7 @@ package net.pottx.element.sign;
 import net.pottx.Cuju;
 import net.pottx.element.Court;
 
-public class Silence extends Sign
+public class Silence extends Particle
 {
     public Silence(Court court, float x, float y)
     {

@@ -5,14 +5,14 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import net.pottx.Cuju;
-import net.pottx.Match;
+import net.pottx.view.Match;
 import net.pottx.Pos;
 import net.pottx.action.Behavior;
 import net.pottx.element.matchunit.*;
 import net.pottx.element.matchunit.player.Player;
 import net.pottx.element.matchunit.player.PlayerBot;
 import net.pottx.element.matchunit.player.PlayerControlled;
-import net.pottx.element.sign.Sign;
+import net.pottx.element.sign.Particle;
 
 import java.util.*;
 
@@ -28,7 +28,7 @@ public class Court implements IGameElement, ICollideable
     private final Pillar[] pillars;
     private Goal goal;
     public float waitingAnim;
-    private final Set<Sign> signs;
+    private final Set<Particle> particles;
     private Sprite actingPointer;
     private final List<MatchUnit> renderUnits;
     private final Comparator<MatchUnit> renderSorter;
@@ -43,7 +43,7 @@ public class Court implements IGameElement, ICollideable
         pillars = new Pillar[2];
         curPlayer = 0;
         waitingAnim = -1.0F;
-        signs = new HashSet<>();
+        particles = new HashSet<>();
         renderUnits = new ArrayList<>();
         renderSorter = (o1, o2) ->
         {
@@ -132,12 +132,12 @@ public class Court implements IGameElement, ICollideable
             ball.logic(TICK);
         }
 
-        for (Sign sign : signs)
+        for (Particle particle : particles)
         {
-            sign.logic(delta);
-            if (sign.getColor().a == 0.0F)
+            particle.logic(delta);
+            if (particle.getColor().a == 0.0F)
             {
-                despawnSign(sign);
+                despawnParticle(particle);
             }
         }
 
@@ -183,14 +183,14 @@ public class Court implements IGameElement, ICollideable
         actingPointer.draw(batch);
         renderUnits.sort(renderSorter);
         renderUnits.forEach(unit -> unit.draw(batch));
-        signs.forEach(sign -> sign.draw(batch));
+        particles.forEach(particle -> particle.draw(batch));
     }
 
     @Override
     public void dispose()
     {
         players.forEach(MatchUnit::dispose);
-        signs.forEach(Sign::dispose);
+        particles.forEach(Particle::dispose);
     }
 
     @Override
@@ -296,13 +296,13 @@ public class Court implements IGameElement, ICollideable
         return true;
     }
 
-    public void spawnSign(Sign sign)
+    public void spawnParticle(Particle particle)
     {
-        signs.add(sign);
+        particles.add(particle);
     }
 
-    public void despawnSign(Sign sign)
+    public void despawnParticle(Particle particle)
     {
-        signs.remove(sign);
+        particles.remove(particle);
     }
 }

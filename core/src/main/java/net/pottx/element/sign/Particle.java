@@ -6,11 +6,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import net.pottx.element.Court;
 import net.pottx.element.IGameElement;
 
-public abstract class Sign extends Sprite implements IGameElement
+public abstract class Particle extends Sprite implements IGameElement
 {
     public Court court;
 
-    public Sign(Court court, Texture texture, float x, float y)
+    public Particle(Court court, Texture texture, float x, float y)
     {
         super(texture);
         this.court = court;

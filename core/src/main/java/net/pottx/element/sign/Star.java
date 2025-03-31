@@ -6,12 +6,12 @@ import net.pottx.element.Court;
 
 import java.util.Random;
 
-public class Congrat extends Sign
+public class Star extends Particle
 {
     private Vector2 motion;
     private final float revolution;
 
-    public Congrat(Court court, float x, float y, float motionX, float motionY)
+    public Star(Court court, float x, float y, float motionX, float motionY)
     {
         super(court, Cuju.instance.textureManager.get("assets/star.png"), x, y);
         motion = new Vector2(motionX, motionY);
