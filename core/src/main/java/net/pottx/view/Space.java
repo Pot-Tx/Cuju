@@ -10,9 +10,9 @@ import net.pottx.element.matchunit.Ball;
 
 public class Space extends Viewport
 {
-    public Vector2 focus;
+    public final Vector2 focus;
     public final Court court;
-    public Vector2 mouseOver;
+    public final Vector2 mouseOver;
 
     public Space(Court court, float width, float height)
     {

@@ -4,15 +4,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import net.pottx.Cuju;
-import net.pottx.view.Match;
 import net.pottx.Pos;
-import net.pottx.action.Behavior;
 import net.pottx.element.matchunit.*;
 import net.pottx.element.matchunit.player.Player;
-import net.pottx.element.matchunit.player.PlayerBot;
-import net.pottx.element.matchunit.player.PlayerControlled;
-import net.pottx.element.sign.Particle;
+import net.pottx.element.particle.Particle;
+import net.pottx.view.Match;
 
 import java.util.*;
 
@@ -33,6 +31,9 @@ public class Court implements IGameElement, ICollideable
     private final List<MatchUnit> renderUnits;
     private final Comparator<MatchUnit> renderSorter;
     private float updateRemainder;
+    public final Pos mousePos;
+    private int round;
+    private Comparator<Player> actionSorter;
 
     public Court(Match match, int x, int y)
     {
@@ -86,13 +87,31 @@ public class Court implements IGameElement, ICollideable
             return 0;
         };
         updateRemainder = 0.0F;
+        mousePos = new Pos(-1, -1);
+        round = 0;
+        actionSorter = (o1, o2) ->
+        {
+            int s1 = o1.actualSpeed;
+            int s2 = o2.actualSpeed;
+            if (s1 < s2)
+            {
+                return 1;
+            }
+            else if (s1 > s2)
+            {
+                return -1;
+            }
+            return 0;
+        };
     }
 
     @Override
     public void input()
     {
-        Player player = getActingPlayer();
+        Vector2 mouse = match.getMouseOver();
+        mousePos.set(mouse.x, mouse.y);
 
+        Player player = getActingPlayer();
         if (player != null)
         {
             if (waitingAnim < 0.0F)
@@ -121,7 +140,10 @@ public class Court implements IGameElement, ICollideable
             waitingAnim = -1.0F;
             if (++curPlayer == players.size())
             {
+                players.forEach(player -> player.rerollSpeed(match.rand));
+                players.sort(actionSorter);
                 curPlayer = 0;
+                ++round;
             }
         }
 
@@ -164,7 +186,7 @@ public class Court implements IGameElement, ICollideable
     @Override
     public void draw(SpriteBatch batch)
     {
-        Texture groundTexture = Cuju.instance.textureManager.get("assets/ground.png");
+        Texture groundTexture = Cuju.instance.getTexture("ground");
         for (int x = 0; x < sizeX; x++)
         {
             for (int y = 0; y < sizeY; y++)
@@ -172,11 +194,10 @@ public class Court implements IGameElement, ICollideable
                 batch.draw(groundTexture, (float) x, (float) y, 1.0F, 1.0F);
             }
         }
-        Pos mousePos = new Pos(match.getMouseOver());
 
         if (isPosValid(mousePos))
         {
-            Texture selectTexture = Cuju.instance.textureManager.get("assets/selection.png");
+            Texture selectTexture = Cuju.instance.getTexture("selection");
             batch.draw(selectTexture, (float) mousePos.getX(), (float) mousePos.getY(), 1.0F, 1.0F);
         }
 
@@ -216,19 +237,22 @@ public class Court implements IGameElement, ICollideable
 
     public void init()
     {
-        spawnPlayer(new PlayerControlled(this, new Pos(0, 2)));
-        spawnPlayer(new PlayerBot(this, new Pos(8, 2), Behavior.RECKLESS));
-        ball = new Ball(this, new Pos(1, 2));
+        match.teamSelf.dispatchPlayers(this);
+        match.teamEnemy.dispatchPlayers(this);
+        ball = new Ball(this, new Pos(sizeX / 2 - 1, sizeY / 2));
         renderUnits.add(ball);
-        pillars[0] = new Pillar(this, new Pos(4, 1));
-        pillars[1] = new Pillar(this, new Pos(4, 3));
+        pillars[0] = new Pillar(this, new Pos(sizeX / 2, sizeY / 2 - 1));
+        pillars[1] = new Pillar(this, new Pos(sizeX / 2, sizeY / 2 + 1));
         renderUnits.add(pillars[0]);
         renderUnits.add(pillars[1]);
-        goal = new Goal(this, new Pos(4, 2));
+        goal = new Goal(this, new Pos(sizeX / 2, sizeY / 2));
         renderUnits.add(goal);
-        Texture actingTexture = Cuju.instance.textureManager.get("assets/acting.png");
+        Texture actingTexture = Cuju.instance.getTexture("acting");
         actingPointer = new Sprite(actingTexture);
         actingPointer.setSize(actingPointer.getWidth() / 16F, actingPointer.getHeight() / 16F);
+        round = 1;
+        players.forEach(player -> player.rerollSpeed(match.rand));
+        players.sort(actionSorter);
     }
 
     public void spawnPlayer(Player player)

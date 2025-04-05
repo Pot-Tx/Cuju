@@ -20,10 +20,16 @@ public class Pillar extends MatchUnit implements ICollideable
     @Override
     protected Sprite createSprite()
     {
-        Texture texture = Cuju.instance.textureManager.get("assets/pillar.png");
+        Texture texture = Cuju.instance.getTexture("pillar");
         Sprite sprite = new Sprite(texture);
         sprite.setSize(sprite.getWidth() / 16F, sprite.getHeight() / 16F);
         return sprite;
+    }
+
+    @Override
+    public String getName()
+    {
+        return "Pillar";
     }
 
     @Override
@@ -43,6 +49,8 @@ public class Pillar extends MatchUnit implements ICollideable
             float v = -speed.dot(radUnit);
             speed.set(2.0F * radUnit.x * v, 2.0F * radUnit.y * v);
             ball.motion.add(speed.x, speed.y, 0.0F);
+
+            Cuju.instance.getSound("hit").play(Math.min(1.0F, 0.25F * speed.len()));
         }
     }
 }

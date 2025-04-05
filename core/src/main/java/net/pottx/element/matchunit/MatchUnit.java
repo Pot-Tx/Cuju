@@ -1,5 +1,6 @@
 package net.pottx.element.matchunit;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
@@ -10,8 +11,8 @@ import net.pottx.element.IGameElement;
 public abstract class MatchUnit implements IGameElement
 {
     public Court court;
-    public Pos tilePos;
-    public Vector3 exactPos;
+    public final Pos tilePos;
+    public final Vector3 exactPos;
     protected Sprite sprite;
 
     public MatchUnit(Court court, Pos pos)
@@ -50,5 +51,17 @@ public abstract class MatchUnit implements IGameElement
     protected void dragSprite()
     {
         sprite.setCenter(exactPos.x, exactPos.y + exactPos.z + sprite.getHeight() / 2.0F - 0.125F);
+    }
+
+    public Texture getPortrait()
+    {
+        return null;
+    }
+
+    public abstract String getName();
+
+    public String getInfo()
+    {
+        return null;
     }
 }

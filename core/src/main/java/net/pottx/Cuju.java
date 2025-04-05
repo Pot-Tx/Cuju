@@ -2,28 +2,43 @@ package net.pottx;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import net.pottx.view.Match;
 
 public class Cuju extends Game
 {
     public static final Cuju instance = new Cuju();
     private boolean loading;
-    public AssetManager textureManager;
+    private AssetManager assetManager;
+    public BitmapFont rosesAreFF0000;
 
     @Override
     public void create()
     {
-        textureManager = new AssetManager();
-        textureManager.load("assets/ball.png", Texture.class);
-        textureManager.load("assets/ground.png", Texture.class);
-        textureManager.load("assets/player.png", Texture.class);
-        textureManager.load("assets/selection.png", Texture.class);
-        textureManager.load("assets/acting.png", Texture.class);
-        textureManager.load("assets/silence.png", Texture.class);
-        textureManager.load("assets/pillar.png", Texture.class);
-        textureManager.load("assets/goal.png", Texture.class);
-        textureManager.load("assets/star.png", Texture.class);
+        assetManager = new AssetManager();
+
+        assetManager.load("assets/textures/ball.png", Texture.class);
+        assetManager.load("assets/textures/ground.png", Texture.class);
+        assetManager.load("assets/textures/player_self.png", Texture.class);
+        assetManager.load("assets/textures/player_enemy.png", Texture.class);
+        assetManager.load("assets/textures/selection.png", Texture.class);
+        assetManager.load("assets/textures/acting.png", Texture.class);
+        assetManager.load("assets/textures/silence.png", Texture.class);
+        assetManager.load("assets/textures/pillar.png", Texture.class);
+        assetManager.load("assets/textures/goal.png", Texture.class);
+        assetManager.load("assets/textures/star.png", Texture.class);
+        assetManager.load("assets/textures/panel.png", Texture.class);
+        assetManager.load("assets/textures/portrait_self.png", Texture.class);
+        assetManager.load("assets/textures/portrait_enemy.png", Texture.class);
+
+        assetManager.load("assets/fonts/RosesareFF0000.fnt", BitmapFont.class);
+
+        assetManager.load("assets/sounds/hit.ogg", Sound.class);
+        assetManager.load("assets/sounds/select.ogg", Sound.class);
+        assetManager.load("assets/sounds/score.ogg", Sound.class);
+
         loading = true;
     }
 
@@ -32,7 +47,7 @@ public class Cuju extends Game
     {
         if (loading)
         {
-            if (textureManager.update())
+            if (assetManager.update())
             {
                 loading = false;
                 Match match = new Match();
@@ -50,6 +65,21 @@ public class Cuju extends Game
     public void dispose()
     {
         super.dispose();
-        textureManager.dispose();
+        assetManager.dispose();
+    }
+
+    public Texture getTexture(String name)
+    {
+        return assetManager.get("assets/textures/" + name + ".png", Texture.class);
+    }
+
+    public Sound getSound(String name)
+    {
+        return assetManager.get("assets/sounds/" + name + ".ogg", Sound.class);
+    }
+
+    public BitmapFont getFont()
+    {
+        return assetManager.get("assets/fonts/RosesareFF0000.fnt", BitmapFont.class);
     }
 }

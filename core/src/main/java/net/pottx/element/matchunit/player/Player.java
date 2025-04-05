@@ -1,39 +1,33 @@
 package net.pottx.element.matchunit.player;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import net.pottx.Cuju;
 import net.pottx.Pos;
 import net.pottx.action.Action;
 import net.pottx.element.Court;
 import net.pottx.element.matchunit.Ball;
 import net.pottx.element.matchunit.MatchUnit;
-import net.pottx.element.sign.Particle;
+import net.pottx.element.particle.Particle;
+import net.pottx.team.Profile;
 
-public class Player extends MatchUnit
+import java.util.Random;
+
+public abstract class Player extends MatchUnit
 {
+    public final Profile profile;
     private Action action;
     public boolean facingLeft;
     private boolean triedCatch;
     private float motionZ;
+    public int actualSpeed;
 
-    public Player(Court court, Pos pos)
+    public Player(Court court, Pos pos, Profile profile)
     {
         super(court, pos);
+        this.profile = profile;
         action = Action.NONE;
         facingLeft = pos.getX() > court.sizeX / 2;
         triedCatch = false;
         motionZ = 0.0F;
-    }
-
-    @Override
-    protected Sprite createSprite()
-    {
-        Texture texture = Cuju.instance.textureManager.get("assets/player.png");
-        Sprite sprite = new Sprite(texture);
-        sprite.setSize(sprite.getWidth() / 16F, sprite.getHeight() / 16F);
-        sprite.setOriginCenter();
-        return sprite;
+        actualSpeed = profile.getSpeed();
     }
 
     @Override
@@ -81,6 +75,19 @@ public class Player extends MatchUnit
         }
 
         super.logic(delta);
+    }
+
+    @Override
+    public String getName()
+    {
+        return profile.name;
+    }
+
+    @Override
+    public String getInfo()
+    {
+        return "Speed " + profile.getSpeed() + "\nSpread " + profile.getSpread() +
+            "\nStamina " + profile.getStamina();
     }
 
     public boolean isActing()
@@ -158,6 +165,11 @@ public class Player extends MatchUnit
             exactPos.y = (float) tilePos.getY() + 0.5F;
             return true;
         }
+    }
+
+    public void rerollSpeed(Random random)
+    {
+        actualSpeed = profile.getSpeed() + random.nextInt(3) - 1;
     }
 
     public void spawnSign(Particle particle)

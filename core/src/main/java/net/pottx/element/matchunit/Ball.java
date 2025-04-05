@@ -26,7 +26,7 @@ public class Ball extends MatchUnit
     @Override
     protected Sprite createSprite()
     {
-        Texture texture = Cuju.instance.textureManager.get("assets/ball.png");
+        Texture texture = Cuju.instance.getTexture("ball");
         Sprite sprite = new Sprite(texture);
         sprite.setSize(sprite.getWidth() / 16F, sprite.getHeight() / 16F);
         sprite.setOriginCenter();
@@ -107,6 +107,8 @@ public class Ball extends MatchUnit
             revolution *= 0.75F;
             motion.z = Math.abs(0.25F * motion.z);
 
+            Cuju.instance.getSound("hit").play(Math.min(1.0F, 0.25F * motion.z));
+
             if (motion.x * motion.x + motion.y * motion.y < 0.125F)
             {
                 motion.x = 0.0F;
@@ -129,5 +131,11 @@ public class Ball extends MatchUnit
     {
         motion.set(x, y, z);
         revolution = (court.match.rand.nextFloat() - 0.5F) * 180F;
+    }
+
+    @Override
+    public String getName()
+    {
+        return "Ball";
     }
 }

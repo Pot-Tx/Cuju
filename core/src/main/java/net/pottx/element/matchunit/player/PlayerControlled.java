@@ -2,15 +2,19 @@ package net.pottx.element.matchunit.player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import net.pottx.Cuju;
 import net.pottx.Pos;
 import net.pottx.action.Action;
 import net.pottx.element.Court;
+import net.pottx.team.Profile;
 
 public class PlayerControlled extends Player
 {
-    public PlayerControlled(Court court, Pos pos)
+    public PlayerControlled(Court court, Pos pos, Profile profile)
     {
-        super(court, pos);
+        super(court, pos, profile);
     }
 
     @Override
@@ -18,7 +22,7 @@ public class PlayerControlled extends Player
     {
         if (!isActing())
         {
-            Pos mousePos = new Pos(court.match.getMouseOver());
+            Pos mousePos = court.mousePos;
             if (court.isPosValid(mousePos))
             {
                 if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
@@ -47,6 +51,7 @@ public class PlayerControlled extends Player
                 {
                     return setAction(Action.MOVE, target);
                 }
+                Cuju.instance.getSound("select").play();
                 break;
 
             case Input.Buttons.RIGHT:
@@ -58,10 +63,27 @@ public class PlayerControlled extends Player
                     }
                     return setAction(Action.KICK, target);
                 }
+                Cuju.instance.getSound("select").play();
                 break;
 
             default:
         }
         return -1.0F;
+    }
+
+    @Override
+    protected Sprite createSprite()
+    {
+        Texture texture = Cuju.instance.getTexture("player_self");
+        Sprite sprite = new Sprite(texture);
+        sprite.setSize(sprite.getWidth() / 16F, sprite.getHeight() / 16F);
+        sprite.setOriginCenter();
+        return sprite;
+    }
+
+    @Override
+    public Texture getPortrait()
+    {
+        return Cuju.instance.getTexture("portrait_self");
     }
 }

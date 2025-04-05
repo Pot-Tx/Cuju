@@ -1,4 +1,4 @@
-package net.pottx.element.sign;
+package net.pottx.element.particle;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;

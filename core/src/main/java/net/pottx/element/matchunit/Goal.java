@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import net.pottx.Cuju;
 import net.pottx.Pos;
 import net.pottx.element.Court;
-import net.pottx.element.sign.Star;
+import net.pottx.element.particle.Star;
 
 import java.util.Random;
 
@@ -33,10 +33,16 @@ public class Goal extends MatchUnit implements ICollideable
     @Override
     protected Sprite createSprite()
     {
-        Texture texture = Cuju.instance.textureManager.get("assets/goal.png");
+        Texture texture = Cuju.instance.getTexture("goal");
         Sprite sprite = new Sprite(texture);
         sprite.setSize(sprite.getWidth() / 16F, sprite.getHeight() / 16F);
         return sprite;
+    }
+
+    @Override
+    public String getName()
+    {
+        return "Goal";
     }
 
     @Override
@@ -62,6 +68,7 @@ public class Goal extends MatchUnit implements ICollideable
                             float motX = relX * (2.0F + rand.nextFloat() * 6.0F);
                             float motY = 1.5F + rand.nextFloat() * 4.5F;
                             court.spawnParticle(new Star(court, exactPos.x + relX, exactPos.y + centerZ + relY, motX, motY));
+                            Cuju.instance.getSound("score").play();
                         }
                     }
                 }
@@ -76,16 +83,19 @@ public class Goal extends MatchUnit implements ICollideable
                         ball.exactPos.x += halfThickness - dX;
                     }
                     ball.motion.x *= -1.0F;
+                    Cuju.instance.getSound("hit").play(Math.min(1.0F, 0.25F * Math.abs(ball.motion.x)));
 
                     if (ball.exactPos.z - minZ < Court.TICK * ball.motion.z)
                     {
                         ball.exactPos.z = minZ;
                         ball.motion.z *= -1.0F;
+                        Cuju.instance.getSound("hit").play(Math.min(1.0F, 0.25F * Math.abs(ball.motion.z)));
                     }
                     else if (ball.exactPos.z - maxZ > Court.TICK * ball.motion.z)
                     {
                         ball.motion.z *= -1.0F;
                         ball.exactPos.z = maxZ;
+                        Cuju.instance.getSound("hit").play(Math.min(1.0F, 0.25F * Math.abs(ball.motion.z)));
                     }
                 }
                 else
@@ -102,6 +112,8 @@ public class Goal extends MatchUnit implements ICollideable
                     float v = -speed.dot(radUnit);
                     speed.set(2.0F * radUnit.x * v, 2.0F * radUnit.y * v);
                     ball.motion.add(0.0F, speed.x, speed.y);
+
+                    Cuju.instance.getSound("hit").play(Math.min(1.0F, 0.25F * speed.len()));
                 }
             }
             else if (shot)

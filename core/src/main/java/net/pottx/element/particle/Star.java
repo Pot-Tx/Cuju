@@ -1,4 +1,4 @@
-package net.pottx.element.sign;
+package net.pottx.element.particle;
 
 import com.badlogic.gdx.math.Vector2;
 import net.pottx.Cuju;
@@ -8,12 +8,12 @@ import java.util.Random;
 
 public class Star extends Particle
 {
-    private Vector2 motion;
+    private final Vector2 motion;
     private final float revolution;
 
     public Star(Court court, float x, float y, float motionX, float motionY)
     {
-        super(court, Cuju.instance.textureManager.get("assets/star.png"), x, y);
+        super(court, Cuju.instance.getTexture("star"), x, y);
         motion = new Vector2(motionX, motionY);
         Random rand = court.match.rand;
         rotate((rand.nextFloat() - 0.5F) * 180F);

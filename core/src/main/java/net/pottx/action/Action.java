@@ -4,7 +4,7 @@ import net.pottx.Pos;
 import net.pottx.element.matchunit.Ball;
 import net.pottx.element.matchunit.MatchUnit;
 import net.pottx.element.matchunit.player.Player;
-import net.pottx.element.sign.Silence;
+import net.pottx.element.particle.Silence;
 
 import java.util.Random;
 
@@ -49,7 +49,8 @@ public abstract class Action
         @Override
         public float set(Player player, Pos pos)
         {
-            player.tilePos = pos;
+            player.facingLeft = pos.getX() < player.tilePos.getX();
+            player.tilePos.set(pos);
             if (player.isHoldingBall())
             {
                 player.court.getBall().tilePos.set(pos);
@@ -85,8 +86,8 @@ public abstract class Action
                 float x = ((float) pos.getX() + 0.5F - ball.exactPos.x) / t;
                 float y = ((float) pos.getY() + 0.5F - ball.exactPos.y) / t;
                 float len = (float) Math.sqrt(x * x + y * y);
-                x += (rand.nextFloat() - 0.5F) * len * 0.25F;
-                y += (rand.nextFloat() - 0.5F) * len * 0.25F;
+                x += (rand.nextFloat() - 0.5F) * len * 0.0625F * (float) player.profile.getSpread();
+                y += (rand.nextFloat() - 0.5F) * len * 0.0625F * (float) player.profile.getSpread();
 
                 ball.exactPos.z = 0.0F;
                 ball.launch(x, y, z);
@@ -131,8 +132,8 @@ public abstract class Action
                 float x = ((float) pos.getX() + 0.5F - ball.exactPos.x) / t;
                 float y = ((float) pos.getY() + 0.5F - ball.exactPos.y) / t;
                 float len = (float) Math.sqrt(x * x + y * y);
-                x += (rand.nextFloat() - 0.5F) * len * 0.25F;
-                y += (rand.nextFloat() - 0.5F) * len * 0.25F;
+                x += (rand.nextFloat() - 0.5F) * len * 0.0625F * (float) player.profile.getSpread();
+                y += (rand.nextFloat() - 0.5F) * len * 0.0625F * (float) player.profile.getSpread();
 
                 ball.exactPos.z = 0.0F;
                 ball.launch(x, y, z);

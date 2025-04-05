@@ -1,4 +1,4 @@
-package net.pottx.element.sign;
+package net.pottx.element.particle;
 
 import net.pottx.Cuju;
 import net.pottx.element.Court;
@@ -7,7 +7,7 @@ public class Silence extends Particle
 {
     public Silence(Court court, float x, float y)
     {
-        super(court, Cuju.instance.textureManager.get("assets/silence.png"), x, y);
+        super(court, Cuju.instance.getTexture("silence"), x, y);
     }
 
     @Override
