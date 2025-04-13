@@ -10,7 +10,8 @@ public abstract class Behavior
         @Override
         public float actWithBall(PlayerBot player)
         {
-            Pos target = player.court.getGoal().tilePos;
+            Pos goalPos = player.court.getGoal().tilePos;
+            Pos target = new Pos(goalPos.getX(), goalPos.getY());
             if (!target.equals(player.tilePos))
             {
                 return player.setAction(Action.SHOOT, target);
